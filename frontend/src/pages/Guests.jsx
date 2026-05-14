@@ -31,7 +31,19 @@ function Guests() {
     { key: 'phone', label: 'Phone' },
     { key: 'rig_type', label: 'Rig Type' },
     { key: 'rig_length', label: 'Rig Length', render: (v) => v ? `${v} ft` : '-' },
-    { key: 'loyalty_points', label: 'Loyalty Points', render: (v) => v ? Number(v).toLocaleString() : '0' },
+    { key: 'loyalty_points', label: 'Loyalty Points', render: (v) => {
+      const pts = Number(v) || 0;
+      const tier = pts >= 500 ? 'Gold' : pts >= 200 ? 'Silver' : 'Bronze';
+      const colors = { Gold: '#d97706', Silver: '#64748b', Bronze: '#92400e' };
+      return (
+        <span>
+          <span style={{ fontWeight: 700 }}>{pts.toLocaleString()}</span>
+          <span style={{ marginLeft: '6px', fontSize: '10px', background: colors[tier] + '20', color: colors[tier], padding: '1px 6px', borderRadius: '10px', fontWeight: 600 }}>
+            {tier}
+          </span>
+        </span>
+      );
+    }},
   ];
 
   const detailFields = [

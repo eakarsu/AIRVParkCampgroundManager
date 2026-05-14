@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db');
 const auth = require('../middleware/auth');
+const requireRole = require('../middleware/requireRole');
 
 router.get('/', async (req, res) => {
   try {
@@ -22,7 +23,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, requireRole('admin'), async (req, res) => {
   try {
     const { name, rate_type, site_type, amount, start_date, end_date, is_active, notes } = req.body;
     const result = await pool.query(
@@ -36,7 +37,7 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', auth, requireRole('admin'), async (req, res) => {
   try {
     const { name, rate_type, site_type, amount, start_date, end_date, is_active, notes } = req.body;
     const result = await pool.query(
@@ -51,7 +52,7 @@ router.put('/:id', auth, async (req, res) => {
   }
 });
 
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', auth, requireRole('admin'), async (req, res) => {
   try {
     await pool.query('DELETE FROM rates WHERE id = $1', [req.params.id]);
     res.json({ message: 'Rate deleted successfully' });

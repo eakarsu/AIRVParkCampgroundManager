@@ -19,6 +19,7 @@ async function seed() {
     // Drop tables in reverse dependency order
     console.log('Dropping existing tables...');
     await client.query(`
+      DROP TABLE IF EXISTS ai_results CASCADE;
       DROP TABLE IF EXISTS dump_station_logs CASCADE;
       DROP TABLE IF EXISTS firewood_inventory CASCADE;
       DROP TABLE IF EXISTS propane_sales CASCADE;
@@ -801,6 +802,21 @@ async function seed() {
       (5, 5, 1, '2026-03-07 08:30:00', 20, 'Weekly dump')
     `);
     console.log('  - dump_station_logs seeded (16 records)');
+
+    // Create ai_results table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS ai_results (
+        id SERIAL PRIMARY KEY,
+        feature VARCHAR(100) NOT NULL,
+        input_summary TEXT,
+        result_text TEXT,
+        result_json JSONB,
+        model_used VARCHAR(100),
+        tokens_used INTEGER,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+    `);
+    console.log('  - ai_results table created');
 
     console.log('\nSeed completed successfully!');
     console.log('Admin login: admin@rvpark.com / admin123');

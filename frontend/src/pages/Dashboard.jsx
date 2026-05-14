@@ -57,6 +57,9 @@ const sections = [
       { icon: '🎯', title: 'Site Matching', desc: 'Smart site assignments', path: '/ai/site-matching' },
       { icon: '📢', title: 'Marketing Content', desc: 'AI-generated campaigns', path: '/ai/marketing-content' },
       { icon: '🔮', title: 'Maintenance AI', desc: 'Predictive maintenance', path: '/ai/maintenance-prediction' },
+      { icon: '👥', title: 'Guest Segmentation', desc: 'CRM clustering & offers', path: '/ai/guest-segmentation' },
+      { icon: '🗓️', title: 'Staff Scheduling', desc: 'AI-balanced shift planner', path: '/ai/staff-scheduling' },
+      { icon: '📈', title: 'Amenity Demand', desc: 'Per-amenity demand forecast', path: '/ai/amenity-demand-prediction' },
     ]
   }
 ];
