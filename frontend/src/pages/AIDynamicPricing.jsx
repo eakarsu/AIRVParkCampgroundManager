@@ -10,9 +10,21 @@ function AIDynamicPricing() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [history, setHistory] = useState([]);
+  const [occupancyStats, setOccupancyStats] = useState(null);
 
   useEffect(() => {
-    api.get('/sites').then(res => setSites(Array.isArray(res) ? res : (res.data || []))).catch(() => {});
+    api.get('/sites').then(res => {
+      const siteList = Array.isArray(res) ? res : (res.data || []);
+      setSites(siteList);
+      const available = siteList.filter(s => s.status === 'available').length;
+      const total = siteList.length || 1;
+      setOccupancyStats({
+        total,
+        available,
+        occupied: total - available,
+        occupancy_rate: Math.round(((total - available) / total) * 100)
+      });
+    }).catch(() => {});
   }, []);
 
   const handleSubmit = async (e) => {
@@ -32,8 +44,31 @@ function AIDynamicPricing() {
       <div className="page-container">
         <div className="ai-section">
           <h2>AI Dynamic Pricing</h2>
-          <p>Get AI-powered pricing recommendations based on demand, seasonality, and market conditions.</p>
+          <p>Get AI-powered pricing recommendations grounded with real-time occupancy data from your database.</p>
         </div>
+
+        {/* Occupancy Stats Panel */}
+        {occupancyStats && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '20px' }}>
+            {[
+              { label: 'Total Sites', value: occupancyStats.total, color: '#6366f1' },
+              { label: 'Available', value: occupancyStats.available, color: '#22c55e' },
+              { label: 'Occupied', value: occupancyStats.occupied, color: '#ef4444' },
+              { label: 'Occupancy Rate', value: `${occupancyStats.occupancy_rate}%`, color: occupancyStats.occupancy_rate >= 80 ? '#ef4444' : occupancyStats.occupancy_rate >= 60 ? '#eab308' : '#22c55e' },
+            ].map(stat => (
+              <div key={stat.label} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', padding: '12px', textAlign: 'center' }}>
+                <div style={{ fontSize: '24px', fontWeight: 800, color: stat.color }}>{stat.value}</div>
+                <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {result?.occupancy_rate !== undefined && (
+          <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '8px', padding: '10px 14px', marginBottom: '16px', fontSize: '13px', color: '#1e40af' }}>
+            <strong>Live Occupancy at time of analysis:</strong> {result.occupancy_rate}% — AI pricing factored this into the recommendation.
+          </div>
+        )}
         <div className="ai-form">
           <form onSubmit={handleSubmit}>
             <div className="form-row">

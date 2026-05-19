@@ -3,6 +3,76 @@ const router = express.Router();
 const pool = require('../db');
 const auth = require('../middleware/auth');
 
+// GET /api/sites/availability?start=DATE&end=DATE
+// Returns matrix: sites as rows, dates as columns, with booking status
+router.get('/availability', async (req, res) => {
+  try {
+    const { start, end } = req.query;
+    if (!start || !end) {
+      return res.status(400).json({ error: 'start and end query params are required (YYYY-MM-DD)' });
+    }
+
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    if (isNaN(startDate) || isNaN(endDate) || endDate <= startDate) {
+      return res.status(400).json({ error: 'Invalid date range' });
+    }
+
+    // Limit to 90 days to avoid huge payloads
+    const maxDays = Math.min(Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)), 90);
+
+    // Get all sites
+    const sitesRes = await pool.query('SELECT id, site_number, type, status, daily_rate FROM sites ORDER BY site_number');
+
+    // Get all reservations overlapping the date range
+    const reservationsRes = await pool.query(`
+      SELECT r.site_id, r.check_in, r.check_out, r.status, r.guest_id,
+             g.first_name, g.last_name
+      FROM reservations r
+      LEFT JOIN guests g ON r.guest_id = g.id
+      WHERE r.status NOT IN ('cancelled')
+        AND r.check_in < $2
+        AND r.check_out > $1
+    `, [start, end]);
+
+    // Build date array
+    const dates = [];
+    const current = new Date(startDate);
+    for (let i = 0; i < maxDays; i++) {
+      dates.push(current.toISOString().split('T')[0]);
+      current.setDate(current.getDate() + 1);
+    }
+
+    // Build availability matrix
+    const matrix = sitesRes.rows.map(site => {
+      const siteReservations = reservationsRes.rows.filter(r => r.site_id === site.id);
+      const availability = {};
+      dates.forEach(date => {
+        const dateObj = new Date(date);
+        const reservation = siteReservations.find(r => {
+          const checkIn = new Date(r.check_in);
+          const checkOut = new Date(r.check_out);
+          return dateObj >= checkIn && dateObj < checkOut;
+        });
+        availability[date] = reservation
+          ? { status: 'booked', reservation_status: reservation.status, guest: `${reservation.first_name || ''} ${reservation.last_name || ''}`.trim() }
+          : { status: site.status === 'available' ? 'available' : site.status };
+      });
+      return {
+        site_id: site.id,
+        site_number: site.site_number,
+        type: site.type,
+        daily_rate: site.daily_rate,
+        availability
+      };
+    });
+
+    res.json({ sites: matrix, dates, start, end });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET all sites
 router.get('/', async (req, res) => {
   try {

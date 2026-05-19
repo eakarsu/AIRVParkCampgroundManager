@@ -45,7 +45,40 @@ router.post('/', auth, async (req, res) => {
        VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
       [reservation_id, guest_id, site_id, type, timestamp || new Date(), notes, processed_by]
     );
-    res.status(201).json(result.rows[0]);
+
+    let loyaltyPointsEarned = 0;
+
+    // Auto-credit loyalty points on checkout
+    if (type === 'checkout' && guest_id && reservation_id) {
+      try {
+        const reservationRes = await pool.query(
+          'SELECT check_in, check_out, total_amount FROM reservations WHERE id = $1',
+          [reservation_id]
+        );
+        if (reservationRes.rows.length > 0) {
+          const res_ = reservationRes.rows[0];
+          const checkIn = new Date(res_.check_in);
+          const checkOut = timestamp ? new Date(timestamp) : new Date();
+          const nightsStayed = Math.max(1, Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24)));
+
+          // 10 points per night stayed + 1 point per $10 spent
+          const nightsPoints = nightsStayed * 10;
+          const spendPoints = Math.floor((parseFloat(res_.total_amount) || 0) / 10);
+          loyaltyPointsEarned = nightsPoints + spendPoints;
+
+          if (loyaltyPointsEarned > 0) {
+            await pool.query(
+              'UPDATE guests SET loyalty_points = COALESCE(loyalty_points, 0) + $1 WHERE id = $2',
+              [loyaltyPointsEarned, guest_id]
+            );
+          }
+        }
+      } catch (loyaltyErr) {
+        console.error('Loyalty points credit error (non-fatal):', loyaltyErr.message);
+      }
+    }
+
+    res.status(201).json({ ...result.rows[0], loyalty_points_earned: loyaltyPointsEarned });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -38,6 +38,32 @@ router.get('/:id', async (req, res) => {
 router.post('/', auth, async (req, res) => {
   try {
     const { site_id, guest_id, check_in, check_out, status, total_amount, notes } = req.body;
+
+    if (!site_id || !check_in || !check_out) {
+      return res.status(400).json({ error: 'site_id, check_in, and check_out are required' });
+    }
+
+    // Conflict check: overlapping reservation for same site
+    const conflictCheck = await pool.query(`
+      SELECT id, check_in, check_out FROM reservations
+      WHERE site_id = $1
+        AND status NOT IN ('cancelled', 'checked_out')
+        AND check_in < $3
+        AND check_out > $2
+    `, [site_id, check_in, check_out]);
+
+    if (conflictCheck.rows.length > 0) {
+      const conflict = conflictCheck.rows[0];
+      return res.status(409).json({
+        error: 'Reservation conflict: site is already booked for overlapping dates',
+        conflict: {
+          reservation_id: conflict.id,
+          check_in: conflict.check_in,
+          check_out: conflict.check_out
+        }
+      });
+    }
+
     const result = await pool.query(
       `INSERT INTO reservations (site_id, guest_id, check_in, check_out, status, total_amount, notes)
        VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,

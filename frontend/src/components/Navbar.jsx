@@ -22,6 +22,7 @@ function Navbar() {
         <Link to="/reservations" className="nav-link">Reservations</Link>
         <Link to="/sites" className="nav-link">Sites</Link>
         <Link to="/guests" className="nav-link">Guests</Link>
+        <Link to="/custom-views" className="nav-link">Park Views</Link>
       </div>
       <div className="nav-user">
         <span className="nav-user-name">{user.name || user.email || 'Admin'}</span>

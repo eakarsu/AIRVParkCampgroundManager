@@ -4,6 +4,7 @@ import DataTable from '../components/DataTable';
 import DetailModal from '../components/DetailModal';
 import FormModal from '../components/FormModal';
 import { api } from '../api';
+import AvailabilityCalendar from '../components/AvailabilityCalendar';
 
 function Reservations() {
   const [data, setData] = useState([]);
@@ -15,6 +16,8 @@ function Reservations() {
   const [showDetail, setShowDetail] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editData, setEditData] = useState(null);
+  const [conflictWarning, setConflictWarning] = useState(null);
+  const [showCalendar, setShowCalendar] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -80,14 +83,26 @@ function Reservations() {
   ];
 
   const handleSubmit = async (formData) => {
+    setConflictWarning(null);
     try {
       if (editData) {
         await api.put(`/reservations/${editData.id || editData._id}`, formData);
       } else {
-        await api.post('/reservations', formData);
+        const res = await api.post('/reservations', formData);
+        if (res && res.error) {
+          setError(res.error);
+          return;
+        }
       }
       setShowForm(false); setEditData(null); fetchData();
-    } catch (e) { setError('Failed to save reservation'); }
+    } catch (e) {
+      // Handle 409 conflict
+      if (e.status === 409 || (e.data && e.data.conflict)) {
+        setConflictWarning(e.data?.error || 'This site is already booked for the selected dates.');
+      } else {
+        setError(e.message || 'Failed to save reservation');
+      }
+    }
   };
 
   const handleDelete = async (item) => {
@@ -107,6 +122,17 @@ function Reservations() {
       <Navbar />
       <div className="page-container">
         {error && <div className="error-message">{error}</div>}
+        {conflictWarning && (
+          <div style={{ background: '#fef2f2', border: '1px solid #ef4444', borderRadius: '8px', padding: '12px 16px', marginBottom: '16px', color: '#dc2626', fontWeight: 500 }}>
+            Conflict: {conflictWarning}
+          </div>
+        )}
+        <div style={{ marginBottom: '12px' }}>
+          <button className="btn btn-secondary" onClick={() => setShowCalendar(!showCalendar)}>
+            {showCalendar ? 'Hide Calendar' : 'Availability Calendar'}
+          </button>
+        </div>
+        {showCalendar && <AvailabilityCalendar />}
         <DataTable title="Reservations" columns={columns} data={data}
           onRowClick={(row) => { setSelected(row); setShowDetail(true); }}
           onAdd={() => { setEditData(null); setShowForm(true); }}
