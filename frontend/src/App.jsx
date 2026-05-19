@@ -56,6 +56,7 @@ import GapNoNotificationssmsSystem from './pages/GapNoNotificationssmsSystem';
 import GapNoPmsIntegrationOtherParkSystems from './pages/GapNoPmsIntegrationOtherParkSystems';
 import GapNoReportingExportBeyondRevenueRoute from './pages/GapNoReportingExportBeyondRevenueRoute';
 // === End Batch 07 ===
+import CustomViewsPage from './pages/CustomViewsPage';
 
 
 function ProtectedRoute({ children }) {
@@ -122,6 +123,7 @@ function App() {
           <Route path='/gap-no-pms-integration-other-park-systems' element={<GapNoPmsIntegrationOtherParkSystems />} />
           <Route path='/gap-no-reporting-export-beyond-revenue-route' element={<GapNoReportingExportBeyondRevenueRoute />} />
           // === End Batch 07 ===
+      <Route path="/custom-views" element={<ProtectedRoute><CustomViewsPage /></ProtectedRoute>} />
     </Routes>
   );
 }

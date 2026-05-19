@@ -91,3 +91,11 @@ app.use('/api/gap-no-notificationssms-system', require('./routes/gap-no-notifica
 app.use('/api/gap-no-pms-integration-other-park-systems', require('./routes/gap-no-pms-integration-other-park-systems'));
 app.use('/api/gap-no-reporting-export-beyond-revenue-route', require('./routes/gap-no-reporting-export-beyond-revenue-route'));
 // === End Batch 07 ===
+
+// === Custom Views (mount BEFORE 404 handler) ===
+app.use('/api/custom-views', require('./routes/customViews'));
+
+// 404 handler for unmatched API routes
+app.use('/api', (req, res) => {
+  res.status(404).json({ error: 'Not found', path: req.originalUrl });
+});
