@@ -23,6 +23,7 @@ function Navbar() {
         <Link to="/sites" className="nav-link">Sites</Link>
         <Link to="/guests" className="nav-link">Guests</Link>
         <Link to="/custom-views" className="nav-link">Park Views</Link>
+        <Link to="/gap-features" className="nav-link">Gap Features</Link>
       </div>
       <div className="nav-user">
         <span className="nav-user-name">{user.name || user.email || 'Admin'}</span>

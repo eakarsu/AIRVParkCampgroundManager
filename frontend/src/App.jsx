@@ -57,7 +57,13 @@ import GapNoPmsIntegrationOtherParkSystems from './pages/GapNoPmsIntegrationOthe
 import GapNoReportingExportBeyondRevenueRoute from './pages/GapNoReportingExportBeyondRevenueRoute';
 // === End Batch 07 ===
 import CustomViewsPage from './pages/CustomViewsPage';
+import GapFeaturesIndex from './pages/GapFeaturesIndex';
 
+
+import CodexCustomVizFeature from './pages/CodexCustomVizFeature';
+import CodexOperationsFeature from './pages/CodexOperationsFeature';
+
+import TimelineView from './pages/TimelineView';
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem('token');
@@ -68,6 +74,10 @@ function ProtectedRoute({ children }) {
 function App() {
   return (
     <Routes>
+        <Route path="/insights/timeline" element={<ProtectedRoute><TimelineView /></ProtectedRoute>} />
+        <Route path="/codex/custom-viz" element={<ProtectedRoute><CodexCustomVizFeature /></ProtectedRoute>} />
+        <Route path="/codex/operations" element={<ProtectedRoute><CodexOperationsFeature /></ProtectedRoute>} />
+
       <Route path="/" element={<Login />} />
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/sites" element={<ProtectedRoute><SiteInventory /></ProtectedRoute>} />
@@ -101,29 +111,30 @@ function App() {
       <Route path="/ai/guest-segmentation" element={<ProtectedRoute><AIGuestSegmentation /></ProtectedRoute>} />
       <Route path="/ai/staff-scheduling" element={<ProtectedRoute><AIStaffScheduling /></ProtectedRoute>} />
       <Route path="/ai/amenity-demand-prediction" element={<ProtectedRoute><AIAmenityDemandPrediction /></ProtectedRoute>} />
-          // === Batch 07 Gaps & Frontend Mounts ===
-          <Route path='/cf-dynamic-pricing-by-occupancy-demand-season' element={<CfDynamicPricingByOccupancyDemandSeason />} />
-          <Route path='/cf-guest-lifetime-value-maximization' element={<CfGuestLifetimeValueMaximization />} />
-          <Route path='/cf-occupancy-forecasting-recommendations' element={<CfOccupancyForecastingRecommendations />} />
-          <Route path='/cf-maintenance-routing-optimization' element={<CfMaintenanceRoutingOptimization />} />
-          <Route path='/cf-amenity-demand-forecasting' element={<CfAmenityDemandForecasting />} />
-          <Route path='/cf-reviewresponsive-marketing' element={<CfReviewresponsiveMarketing />} />
-          <Route path='/gap-no-cancellationrisk-noshow-prediction' element={<GapNoCancellationriskNoshowPrediction />} />
-          <Route path='/gap-no-upsellrecommendations' element={<GapNoUpsellrecommendations />} />
-          <Route path='/gap-no-guestsegmentation-cluster-by-behavior' element={<GapNoGuestsegmentationClusterByBehavior />} />
-          <Route path='/gap-no-occupancyforecast' element={<GapNoOccupancyforecast />} />
-          <Route path='/gap-no-staffscheduling-optimization' element={<GapNoStaffschedulingOptimization />} />
-          <Route path='/gap-no-amenitydemandprediction' element={<GapNoAmenitydemandprediction />} />
-          <Route path='/gap-no-reviewresponse-ai-sister-product' element={<GapNoReviewresponseAiSisterProduct />} />
-          <Route path='/gap-no-online-booking-widget-public-api' element={<GapNoOnlineBookingWidgetPublicApi />} />
-          <Route path='/gap-no-automated-guest-communications-confirmati' element={<GapNoAutomatedGuestCommunicationsConfirmati />} />
-          <Route path='/gap-no-payment-processor-integration-stripe-squa' element={<GapNoPaymentProcessorIntegrationStripeSqua />} />
-          <Route path='/gap-limited-housekeepingmaintenance-ticketing-on' element={<GapLimitedHousekeepingmaintenanceTicketingOn />} />
-          <Route path='/gap-no-notificationssms-system' element={<GapNoNotificationssmsSystem />} />
-          <Route path='/gap-no-pms-integration-other-park-systems' element={<GapNoPmsIntegrationOtherParkSystems />} />
-          <Route path='/gap-no-reporting-export-beyond-revenue-route' element={<GapNoReportingExportBeyondRevenueRoute />} />
-          // === End Batch 07 ===
+      {/* === Batch 07 Gaps & Frontend Mounts === */}
+      <Route path='/cf-dynamic-pricing-by-occupancy-demand-season' element={<ProtectedRoute><CfDynamicPricingByOccupancyDemandSeason /></ProtectedRoute>} />
+      <Route path='/cf-guest-lifetime-value-maximization' element={<ProtectedRoute><CfGuestLifetimeValueMaximization /></ProtectedRoute>} />
+      <Route path='/cf-occupancy-forecasting-recommendations' element={<ProtectedRoute><CfOccupancyForecastingRecommendations /></ProtectedRoute>} />
+      <Route path='/cf-maintenance-routing-optimization' element={<ProtectedRoute><CfMaintenanceRoutingOptimization /></ProtectedRoute>} />
+      <Route path='/cf-amenity-demand-forecasting' element={<ProtectedRoute><CfAmenityDemandForecasting /></ProtectedRoute>} />
+      <Route path='/cf-reviewresponsive-marketing' element={<ProtectedRoute><CfReviewresponsiveMarketing /></ProtectedRoute>} />
+      <Route path='/gap-no-cancellationrisk-noshow-prediction' element={<ProtectedRoute><GapNoCancellationriskNoshowPrediction /></ProtectedRoute>} />
+      <Route path='/gap-no-upsellrecommendations' element={<ProtectedRoute><GapNoUpsellrecommendations /></ProtectedRoute>} />
+      <Route path='/gap-no-guestsegmentation-cluster-by-behavior' element={<ProtectedRoute><GapNoGuestsegmentationClusterByBehavior /></ProtectedRoute>} />
+      <Route path='/gap-no-occupancyforecast' element={<ProtectedRoute><GapNoOccupancyforecast /></ProtectedRoute>} />
+      <Route path='/gap-no-staffscheduling-optimization' element={<ProtectedRoute><GapNoStaffschedulingOptimization /></ProtectedRoute>} />
+      <Route path='/gap-no-amenitydemandprediction' element={<ProtectedRoute><GapNoAmenitydemandprediction /></ProtectedRoute>} />
+      <Route path='/gap-no-reviewresponse-ai-sister-product' element={<ProtectedRoute><GapNoReviewresponseAiSisterProduct /></ProtectedRoute>} />
+      <Route path='/gap-no-online-booking-widget-public-api' element={<ProtectedRoute><GapNoOnlineBookingWidgetPublicApi /></ProtectedRoute>} />
+      <Route path='/gap-no-automated-guest-communications-confirmati' element={<ProtectedRoute><GapNoAutomatedGuestCommunicationsConfirmati /></ProtectedRoute>} />
+      <Route path='/gap-no-payment-processor-integration-stripe-squa' element={<ProtectedRoute><GapNoPaymentProcessorIntegrationStripeSqua /></ProtectedRoute>} />
+      <Route path='/gap-limited-housekeepingmaintenance-ticketing-on' element={<ProtectedRoute><GapLimitedHousekeepingmaintenanceTicketingOn /></ProtectedRoute>} />
+      <Route path='/gap-no-notificationssms-system' element={<ProtectedRoute><GapNoNotificationssmsSystem /></ProtectedRoute>} />
+      <Route path='/gap-no-pms-integration-other-park-systems' element={<ProtectedRoute><GapNoPmsIntegrationOtherParkSystems /></ProtectedRoute>} />
+      <Route path='/gap-no-reporting-export-beyond-revenue-route' element={<ProtectedRoute><GapNoReportingExportBeyondRevenueRoute /></ProtectedRoute>} />
+      {/* === End Batch 07 === */}
       <Route path="/custom-views" element={<ProtectedRoute><CustomViewsPage /></ProtectedRoute>} />
+      <Route path="/gap-features" element={<ProtectedRoute><GapFeaturesIndex /></ProtectedRoute>} />
     </Routes>
   );
 }
