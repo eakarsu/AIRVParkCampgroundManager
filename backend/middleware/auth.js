@@ -13,7 +13,9 @@ const auth = (req, res, next) => {
       ? authHeader.slice(7)
       : authHeader;
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'rv_park_secret_key_2024');
+    if ((process.env.JWT_SECRET || '').length < 32) return res.status(503).json({ error: 'Secure authentication is not configured' });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'] });
+    if (!decoded.tenantId || !decoded.role) throw new Error('missing authorization context');
     req.user = decoded;
     next();
   } catch (err) {

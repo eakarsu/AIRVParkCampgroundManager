@@ -4,14 +4,12 @@ const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '..', '..', '.env') });
 
 const pool = new Pool({
-  user: process.env.DB_USER || 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_NAME || 'rv_park_manager',
-  password: process.env.DB_PASSWORD || 'postgres',
-  port: parseInt(process.env.DB_PORT || '5432', 10),
+  connectionString: process.env.DATABASE_URL,
 });
 
 async function seed() {
+  if (process.env.ALLOW_DESTRUCTIVE_SEED !== '1') throw new Error('Set ALLOW_DESTRUCTIVE_SEED=1 only for an isolated demo database');
+  if ((process.env.SEED_ADMIN_PASSWORD || '').length < 12 || (process.env.SEED_STAFF_PASSWORD || '').length < 12) throw new Error('Explicit 12+ character seed passwords are required');
   const client = await pool.connect();
   try {
     console.log('Starting database seed...');
@@ -355,8 +353,8 @@ async function seed() {
     console.log('\nSeeding data...');
 
     // Users
-    const adminHash = await bcrypt.hash('admin123', 10);
-    const staffHash = await bcrypt.hash('staff123', 10);
+    const adminHash = await bcrypt.hash(process.env.SEED_ADMIN_PASSWORD, 10);
+    const staffHash = await bcrypt.hash(process.env.SEED_STAFF_PASSWORD, 10);
     await client.query(`
       INSERT INTO users (email, password_hash, name, role) VALUES
       ('admin@rvpark.com', $1, 'Park Administrator', 'admin'),
@@ -819,7 +817,7 @@ async function seed() {
     console.log('  - ai_results table created');
 
     console.log('\nSeed completed successfully!');
-    console.log('Admin login: admin@rvpark.com / admin123');
+    console.log('Seed users created; credentials were supplied through the environment.');
   } catch (err) {
     console.error('Seed error:', err.message);
     throw err;
