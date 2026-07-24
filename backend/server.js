@@ -46,7 +46,7 @@ app.use('/api/mail', require('./routes/mail'));
 app.use('/api/propane', require('./routes/propane'));
 app.use('/api/firewood', require('./routes/firewood'));
 app.use('/api/dump-station', require('./routes/dumpStation'));
-if (process.env.ENABLE_GENERATED_ROUTES === 'true' && process.env.NODE_ENV !== 'production') app.use('/api/ai', require('./routes/ai'));
+app.use('/api/ai', require('./routes/ai'));
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -58,8 +58,16 @@ if (process.env.ENABLE_GENERATED_ROUTES === 'true' && process.env.NODE_ENV !== '
 app.use('/api/custom-views', require('./routes/customViews'));
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found', path: req.originalUrl }));
 
-app.listen(PORT, () => {
-  console.log(`RV Park Manager API running on port ${PORT}`);
+async function start() {
+  await require('./runtimeBootstrap').bootstrapRuntime();
+  app.listen(PORT, () => {
+    console.log(`RV Park Manager API running on port ${PORT}`);
+  });
+}
+
+start().catch((error) => {
+  console.error('Failed to start server:', error);
+  process.exit(1);
 });
 
 module.exports = app;

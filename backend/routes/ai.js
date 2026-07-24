@@ -28,9 +28,6 @@ const validate = (validations) => async (req, res, next) => {
   next();
 };
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'anthropic/claude-3-5-sonnet-20241022';
-
 // 3-strategy JSON parser
 function parseAIJson(content) {
   try { return JSON.parse(content); } catch (_) {}
@@ -46,16 +43,16 @@ function parseAIJson(content) {
 }
 
 async function callOpenRouter(systemPrompt, userPrompt) {
-  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+  const response = await fetch(`${process.env.OPENROUTER_BASE_URL.replace(/\/+$/, '')}/chat/completions`, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+      'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
       'Content-Type': 'application/json',
       'HTTP-Referer': process.env.CLIENT_URL || 'http://localhost:3001',
       'X-Title': 'RV Park Manager'
     },
     body: JSON.stringify({
-      model: OPENROUTER_MODEL,
+      model: process.env.OPENROUTER_MODEL,
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }
@@ -64,23 +61,21 @@ async function callOpenRouter(systemPrompt, userPrompt) {
     })
   });
 
+  if (!response.ok) throw new Error(`OpenRouter API error: HTTP ${response.status}`);
   const data = await response.json();
   if (data.error) {
     throw new Error(data.error.message || 'OpenRouter API error');
   }
-  const content = data.choices?.[0]?.message?.content || '';
+  const content = data.choices?.[0]?.message?.content?.trim();
+  if (!content) throw new Error('OpenRouter returned no substantive content');
   return { content, usage: data.usage };
 }
 
 async function persistAIResult(feature, inputSummary, rawContent, parsedData) {
-  try {
-    await pool.query(`
-      INSERT INTO ai_results (feature, input_summary, result_text, result_json, model_used, created_at)
-      VALUES ($1, $2, $3, $4, $5, NOW())
-    `, [feature, inputSummary.substring(0, 200), rawContent, parsedData ? JSON.stringify(parsedData) : null, OPENROUTER_MODEL]);
-  } catch (_) {
-    // Non-fatal if table doesn't exist yet
-  }
+  await pool.query(`
+    INSERT INTO ai_results (feature, input_summary, result_text, result_json, model_used, created_at)
+    VALUES ($1, $2, $3, $4, $5, NOW())
+  `, [feature, inputSummary.substring(0, 200), rawContent, parsedData ? JSON.stringify(parsedData) : null, process.env.OPENROUTER_MODEL]);
 }
 
 // All AI routes require auth + rate limiting
@@ -89,7 +84,7 @@ router.use(aiRateLimiter);
 
 // 503-on-no-key gate for the new mechanical-backlog endpoints below.
 function requireAIKey(req, res, next) {
-  if (!OPENROUTER_API_KEY) {
+  if (!process.env.OPENROUTER_API_KEY) {
     return res.status(503).json({ error: 'AI provider not configured. Set OPENROUTER_API_KEY in the backend environment to enable this feature.' });
   }
   next();
@@ -359,6 +354,16 @@ router.post('/amenity-demand-prediction', requireAIKey, async (req, res) => {
     await persistAIResult('amenity-demand-prediction', `horizon:${horizon}`, content, parsed);
     res.json({ success: true, data: parsed || { raw_response: content }, raw_response: content });
   } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+router.get('/history', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT id, feature, model_used, created_at FROM ai_results ORDER BY created_at DESC LIMIT 25');
+    const count = await pool.query('SELECT COUNT(*)::int AS total FROM ai_results');
+    res.json({ total: count.rows[0].total, data: result.rows });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;
