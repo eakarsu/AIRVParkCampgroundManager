@@ -45,7 +45,7 @@ function Login() {
         </div>
         {error && <div className="login-error">{error}</div>}
         <button className="auto-fill-btn" onClick={handleAutoFill} type="button">
-          Auto-Fill Demo Credentials
+          Auto Fill Demo Credentials
         </button>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
