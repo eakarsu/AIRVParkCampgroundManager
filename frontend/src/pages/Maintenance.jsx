@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar';
 import DataTable from '../components/DataTable';
 import DetailModal from '../components/DetailModal';
 import FormModal from '../components/FormModal';
-import { api } from '../api';
+import { api, recordsFromResponse } from '../api';
 
 function Maintenance() {
   const [data, setData] = useState([]);
@@ -19,8 +19,8 @@ function Maintenance() {
     try {
       setLoading(true);
       const [d, s] = await Promise.all([api.get('/maintenance'), api.get('/sites')]);
-      setData(Array.isArray(d) ? d : (d.data || []));
-      setSites(Array.isArray(s) ? s : (s.data || []));
+      setData(recordsFromResponse(d));
+      setSites(recordsFromResponse(s));
     } catch (e) { setError('Failed to load data'); } finally { setLoading(false); }
   };
 

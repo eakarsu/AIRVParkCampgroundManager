@@ -1,7 +1,8 @@
+import CompleteAIExamples, { AIRequiredButton } from "../components/CompleteAIExamples";
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import AIOutput from '../components/AIOutput';
-import { api } from '../api';
+import { api, recordsFromResponse } from '../api';
 
 function AIDynamicPricing() {
   const [sites, setSites] = useState([]);
@@ -14,7 +15,7 @@ function AIDynamicPricing() {
 
   useEffect(() => {
     api.get('/sites').then(res => {
-      const siteList = Array.isArray(res) ? res : (res.data || []);
+      const siteList = recordsFromResponse(res);
       setSites(siteList);
       const available = siteList.filter(s => s.status === 'available').length;
       const total = siteList.length || 1;
@@ -70,18 +71,18 @@ function AIDynamicPricing() {
           </div>
         )}
         <div className="ai-form">
-          <form onSubmit={handleSubmit}>
+          <CompleteAIExamples busy={loading} context="RV park planning review"><form onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
                 <label>Site</label>
-                <select className="form-select" value={form.site_id} onChange={e => setForm({ ...form, site_id: e.target.value })}>
+                <select data-ai-field="site_id" className="form-select" value={form.site_id} onChange={e => setForm({ ...form, site_id: e.target.value })}>
                   <option value="">Select a site</option>
                   {sites.map(s => <option key={s.id || s._id} value={s.id || s._id}>Site {s.site_number} ({s.type})</option>)}
                 </select>
               </div>
               <div className="form-group">
                 <label>Season</label>
-                <select className="form-select" value={form.season} onChange={e => setForm({ ...form, season: e.target.value })}>
+                <select data-ai-field="season" className="form-select" value={form.season} onChange={e => setForm({ ...form, season: e.target.value })}>
                   <option value="spring">Spring</option>
                   <option value="summer">Summer</option>
                   <option value="fall">Fall</option>
@@ -92,25 +93,25 @@ function AIDynamicPricing() {
             <div className="form-row">
               <div className="form-group">
                 <label>Events Nearby</label>
-                <input className="form-input" value={form.events_nearby} onChange={e => setForm({ ...form, events_nearby: e.target.value })} placeholder="e.g., Music festival, Holiday weekend" />
+                <input data-ai-field="events_nearby" className="form-input" value={form.events_nearby} onChange={e => setForm({ ...form, events_nearby: e.target.value })} placeholder="e.g., Music festival, Holiday weekend" />
               </div>
               <div className="form-group">
                 <label>Weather Conditions</label>
-                <input className="form-input" value={form.weather} onChange={e => setForm({ ...form, weather: e.target.value })} placeholder="e.g., Sunny, 75F" />
+                <input data-ai-field="weather" className="form-input" value={form.weather} onChange={e => setForm({ ...form, weather: e.target.value })} placeholder="e.g., Sunny, 75F" />
               </div>
             </div>
             <div className="form-row">
               <div className="form-group">
                 <label>Current Rate ($)</label>
-                <input className="form-input" type="number" step="any" value={form.current_rate} onChange={e => setForm({ ...form, current_rate: e.target.value })} placeholder="45.00" />
+                <input data-ai-field="current_rate" className="form-input" type="number" step="any" value={form.current_rate} onChange={e => setForm({ ...form, current_rate: e.target.value })} placeholder="45.00" />
               </div>
               <div className="form-group" style={{ display: 'flex', alignItems: 'flex-end' }}>
-                <button type="submit" className="ai-generate-btn" disabled={loading}>
+                <AIRequiredButton data-ai-generate type="submit" className="ai-generate-btn" disabled={loading}>
                   {loading ? 'Analyzing...' : 'Generate Pricing'}
-                </button>
+                </AIRequiredButton>
               </div>
             </div>
-          </form>
+          </form></CompleteAIExamples>
         </div>
         <AIOutput data={result} loading={loading} error={error} />
         {history.length > 1 && (

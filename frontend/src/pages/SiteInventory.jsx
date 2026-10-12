@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar';
 import DataTable from '../components/DataTable';
 import DetailModal from '../components/DetailModal';
 import FormModal from '../components/FormModal';
-import { api } from '../api';
+import { api, recordsFromResponse } from '../api';
 
 function SiteInventory() {
   const [data, setData] = useState([]);
@@ -18,7 +18,7 @@ function SiteInventory() {
     try {
       setLoading(true);
       const res = await api.get('/sites');
-      setData(Array.isArray(res) ? res : (res.data || []));
+      setData(recordsFromResponse(res));
     } catch (e) { setError('Failed to load sites'); }
     finally { setLoading(false); }
   };

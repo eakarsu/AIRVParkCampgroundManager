@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar';
 import DataTable from '../components/DataTable';
 import DetailModal from '../components/DetailModal';
 import FormModal from '../components/FormModal';
-import { api } from '../api';
+import { api, recordsFromResponse } from '../api';
 
 function AmenityBookings() {
   const [data, setData] = useState([]);
@@ -20,9 +20,9 @@ function AmenityBookings() {
     try {
       setLoading(true);
       const [d, a, g] = await Promise.all([api.get('/amenity-bookings'), api.get('/amenities'), api.get('/guests')]);
-      setData(Array.isArray(d) ? d : (d.data || []));
-      setAmenities(Array.isArray(a) ? a : (a.data || []));
-      setGuests(Array.isArray(g) ? g : (g.data || []));
+      setData(recordsFromResponse(d));
+      setAmenities(recordsFromResponse(a));
+      setGuests(recordsFromResponse(g));
     } catch (e) { setError('Failed to load data'); } finally { setLoading(false); }
   };
 

@@ -1,7 +1,8 @@
+import CompleteAIExamples, { AIRequiredButton } from "../components/CompleteAIExamples";
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import AIOutput from '../components/AIOutput';
-import { api } from '../api';
+import { api, recordsFromResponse } from '../api';
 
 function AICancellationRisk() {
   const [reservations, setReservations] = useState([]);
@@ -14,7 +15,7 @@ function AICancellationRisk() {
   useEffect(() => {
     api.get('/reservations')
       .then(res => {
-        const list = Array.isArray(res) ? res : (res.data || []);
+        const list = recordsFromResponse(res);
         setReservations(list);
       })
       .catch(() => {});
@@ -58,11 +59,11 @@ function AICancellationRisk() {
         </div>
 
         <div className="ai-form">
-          <form onSubmit={handleSubmit}>
+          <CompleteAIExamples busy={loading} context="RV park planning review"><form onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
                 <label>Reservation</label>
-                <select className="form-select" value={reservationId} onChange={e => setReservationId(e.target.value)}>
+                <select data-ai-field="reservationId" className="form-select" value={reservationId} onChange={e => setReservationId(e.target.value)}>
                   <option value="">Select a reservation</option>
                   {reservations.map(r => (
                     <option key={r.id || r._id} value={r.id || r._id}>
@@ -75,7 +76,7 @@ function AICancellationRisk() {
 
             <div className="form-group">
               <label>Recent behavior / signals (optional)</label>
-              <textarea
+              <textarea data-ai-field="recentBehavior"
                 className="form-input"
                 rows={3}
                 value={recentBehavior}
@@ -86,10 +87,10 @@ function AICancellationRisk() {
 
             {error && <div style={{ background: '#fee2e2', color: '#991b1b', padding: 10, borderRadius: 6, margin: '10px 0' }}>{error}</div>}
 
-            <button type="submit" className="btn-primary" disabled={loading}>
+            <AIRequiredButton data-ai-generate type="submit" className="btn-primary" disabled={loading}>
               {loading ? 'Scoring...' : 'Score Cancellation Risk'}
-            </button>
-          </form>
+            </AIRequiredButton>
+          </form></CompleteAIExamples>
         </div>
 
         {loading && <div style={{ padding: 20, textAlign: 'center', color: '#94a3b8' }}>AI is computing cancellation risk...</div>}

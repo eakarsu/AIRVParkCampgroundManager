@@ -1,3 +1,4 @@
+import CompleteAIExamples, { AIRequiredButton } from "../components/CompleteAIExamples";
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import AIOutput from '../components/AIOutput';
@@ -39,11 +40,11 @@ function AIOccupancyForecast() {
         </div>
 
         <div className="ai-form">
-          <form onSubmit={handleSubmit}>
+          <CompleteAIExamples busy={loading} context="RV park planning review"><form onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
                 <label>Forecast horizon (days)</label>
-                <input
+                <input data-ai-field="days"
                   type="number"
                   className="form-input"
                   min="1"
@@ -63,7 +64,7 @@ function AIOccupancyForecast() {
 
             <div className="form-group">
               <label>Local events / context (optional)</label>
-              <textarea
+              <textarea data-ai-field="eventsNearby"
                 className="form-input"
                 rows={3}
                 value={eventsNearby}
@@ -74,10 +75,10 @@ function AIOccupancyForecast() {
 
             {error && <div className="error-message" style={{ background: '#fee2e2', color: '#991b1b', padding: 10, borderRadius: 6, margin: '10px 0' }}>{error}</div>}
 
-            <button type="submit" className="btn-primary" disabled={loading}>
+            <AIRequiredButton data-ai-generate type="submit" className="btn-primary" disabled={loading}>
               {loading ? 'Forecasting...' : 'Generate Forecast'}
-            </button>
-          </form>
+            </AIRequiredButton>
+          </form></CompleteAIExamples>
         </div>
 
         {loading && <div style={{ padding: 20, textAlign: 'center', color: '#94a3b8' }}>AI is analyzing reservations data...</div>}

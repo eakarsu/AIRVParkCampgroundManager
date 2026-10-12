@@ -35,6 +35,7 @@ import AICancellationRisk from './pages/AICancellationRisk';
 import AIGuestSegmentation from './pages/AIGuestSegmentation';
 import AIStaffScheduling from './pages/AIStaffScheduling';
 import AIAmenityDemandPrediction from './pages/AIAmenityDemandPrediction';
+import AIHistory from './pages/AIHistory';
 
 // === Batch 07 Gaps & Frontend Mounts ===
 import CfDynamicPricingByOccupancyDemandSeason from './pages/CfDynamicPricingByOccupancyDemandSeason';
@@ -122,6 +123,7 @@ function App() {
       <Route path="/ai/guest-segmentation" element={<ProtectedRoute><AIGuestSegmentation /></ProtectedRoute>} />
       <Route path="/ai/staff-scheduling" element={<ProtectedRoute><AIStaffScheduling /></ProtectedRoute>} />
       <Route path="/ai/amenity-demand-prediction" element={<ProtectedRoute><AIAmenityDemandPrediction /></ProtectedRoute>} />
+      <Route path="/ai/history" element={<ProtectedRoute><AIHistory /></ProtectedRoute>} />
       {/* === Batch 07 Gaps & Frontend Mounts === */}
       <Route path='/cf-dynamic-pricing-by-occupancy-demand-season' element={<ProtectedRoute><CfDynamicPricingByOccupancyDemandSeason /></ProtectedRoute>} />
       <Route path='/cf-guest-lifetime-value-maximization' element={<ProtectedRoute><CfGuestLifetimeValueMaximization /></ProtectedRoute>} />

@@ -1,3 +1,4 @@
+import CompleteAIExamples, { AIRequiredButton } from "../components/CompleteAIExamples";
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import AIOutput from '../components/AIOutput';
@@ -30,15 +31,15 @@ function AIReviewResponse() {
           <p>Generate professional, thoughtful responses to guest reviews using AI.</p>
         </div>
         <div className="ai-form">
-          <form onSubmit={handleSubmit}>
+          <CompleteAIExamples busy={loading} context="RV park planning review"><form onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
                 <label>Guest Name</label>
-                <input className="form-input" value={form.guest_name} onChange={e => setForm({ ...form, guest_name: e.target.value })} placeholder="Guest name" />
+                <input data-ai-field="guest_name" className="form-input" value={form.guest_name} onChange={e => setForm({ ...form, guest_name: e.target.value })} placeholder="Guest name" />
               </div>
               <div className="form-group">
                 <label>Rating</label>
-                <select className="form-select" value={form.rating} onChange={e => setForm({ ...form, rating: e.target.value })}>
+                <select data-ai-field="rating" className="form-select" value={form.rating} onChange={e => setForm({ ...form, rating: e.target.value })}>
                   <option value="1">1 Star</option>
                   <option value="2">2 Stars</option>
                   <option value="3">3 Stars</option>
@@ -49,13 +50,13 @@ function AIReviewResponse() {
             </div>
             <div className="form-group">
               <label>Review Text</label>
-              <textarea className="form-textarea" value={form.review_text} onChange={e => setForm({ ...form, review_text: e.target.value })}
+              <textarea data-ai-field="review_text" className="form-textarea" value={form.review_text} onChange={e => setForm({ ...form, review_text: e.target.value })}
                 placeholder="Paste the guest review here..." style={{ minHeight: '120px' }} />
             </div>
-            <button type="submit" className="ai-generate-btn" disabled={loading || !form.review_text}>
+            <AIRequiredButton data-ai-generate type="submit" className="ai-generate-btn" disabled={loading || !form.review_text}>
               {loading ? 'Generating...' : 'Generate Response'}
-            </button>
-          </form>
+            </AIRequiredButton>
+          </form></CompleteAIExamples>
         </div>
         <AIOutput data={result} loading={loading} error={error} />
         {history.length > 1 && (

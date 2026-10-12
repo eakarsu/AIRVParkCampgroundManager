@@ -1,3 +1,4 @@
+import CompleteAIExamples, { AIRequiredButton } from "../components/CompleteAIExamples";
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import AIOutput from '../components/AIOutput';
@@ -36,11 +37,11 @@ function AIGuestSegmentation() {
         </div>
 
         <div className="ai-form">
-          <form onSubmit={handleSubmit}>
+          <CompleteAIExamples busy={loading} context="RV park planning review"><form onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
                 <label>Number of segments</label>
-                <input
+                <input data-ai-field="numSegments"
                   className="form-input"
                   type="number"
                   min={2}
@@ -53,10 +54,10 @@ function AIGuestSegmentation() {
 
             {error && <div style={{ background: '#fee2e2', color: '#991b1b', padding: 10, borderRadius: 6, margin: '10px 0' }}>{error}</div>}
 
-            <button type="submit" className="btn-primary" disabled={loading}>
+            <AIRequiredButton data-ai-generate type="submit" className="btn-primary" disabled={loading}>
               {loading ? 'Segmenting...' : 'Generate Segments'}
-            </button>
-          </form>
+            </AIRequiredButton>
+          </form></CompleteAIExamples>
         </div>
 
         {loading && <div style={{ padding: 20, textAlign: 'center', color: '#94a3b8' }}>AI is clustering guests...</div>}

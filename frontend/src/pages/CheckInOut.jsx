@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar';
 import DataTable from '../components/DataTable';
 import DetailModal from '../components/DetailModal';
 import FormModal from '../components/FormModal';
-import { api } from '../api';
+import { api, recordsFromResponse } from '../api';
 
 function CheckInOut() {
   const [data, setData] = useState([]);
@@ -23,10 +23,10 @@ function CheckInOut() {
       const [d, r, g, s] = await Promise.all([
         api.get('/checkinout'), api.get('/reservations'), api.get('/guests'), api.get('/sites')
       ]);
-      setData(Array.isArray(d) ? d : (d.data || []));
-      setReservations(Array.isArray(r) ? r : (r.data || []));
-      setGuests(Array.isArray(g) ? g : (g.data || []));
-      setSites(Array.isArray(s) ? s : (s.data || []));
+      setData(recordsFromResponse(d));
+      setReservations(recordsFromResponse(r));
+      setGuests(recordsFromResponse(g));
+      setSites(recordsFromResponse(s));
     } catch (e) { setError('Failed to load data'); }
     finally { setLoading(false); }
   };

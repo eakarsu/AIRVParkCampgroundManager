@@ -1,7 +1,8 @@
+import CompleteAIExamples, { AIRequiredButton } from "../components/CompleteAIExamples";
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import AIOutput from '../components/AIOutput';
-import { api } from '../api';
+import { api, recordsFromResponse } from '../api';
 
 function AIMaintenancePrediction() {
   const [sites, setSites] = useState([]);
@@ -14,7 +15,7 @@ function AIMaintenancePrediction() {
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
-    api.get('/sites').then(res => setSites(Array.isArray(res) ? res : (res.data || []))).catch(() => {});
+    api.get('/sites').then(res => setSites(recordsFromResponse(res))).catch(() => {});
   }, []);
 
   const handleSubmit = async (e) => {
@@ -37,39 +38,39 @@ function AIMaintenancePrediction() {
           <p>Predict upcoming maintenance needs and prevent costly breakdowns with AI analysis.</p>
         </div>
         <div className="ai-form">
-          <form onSubmit={handleSubmit}>
+          <CompleteAIExamples busy={loading} context="RV park planning review"><form onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
                 <label>Site</label>
-                <select className="form-select" value={form.site_id} onChange={e => setForm({ ...form, site_id: e.target.value })}>
+                <select data-ai-field="site_id" className="form-select" value={form.site_id} onChange={e => setForm({ ...form, site_id: e.target.value })}>
                   <option value="">Select a site</option>
                   {sites.map(s => <option key={s.id || s._id} value={s.id || s._id}>Site {s.site_number} ({s.type})</option>)}
                 </select>
               </div>
               <div className="form-group">
                 <label>Site Age (years)</label>
-                <input className="form-input" type="number" value={form.site_age_years} onChange={e => setForm({ ...form, site_age_years: e.target.value })} placeholder="e.g., 5" />
+                <input data-ai-field="site_age_years" className="form-input" type="number" value={form.site_age_years} onChange={e => setForm({ ...form, site_age_years: e.target.value })} placeholder="e.g., 5" />
               </div>
             </div>
             <div className="form-row">
               <div className="form-group">
                 <label>Last Maintenance Date</label>
-                <input className="form-input" type="date" value={form.last_maintenance} onChange={e => setForm({ ...form, last_maintenance: e.target.value })} />
+                <input data-ai-field="last_maintenance" className="form-input" type="date" value={form.last_maintenance} onChange={e => setForm({ ...form, last_maintenance: e.target.value })} />
               </div>
               <div className="form-group">
                 <label>Weather Conditions</label>
-                <input className="form-input" value={form.weather_conditions} onChange={e => setForm({ ...form, weather_conditions: e.target.value })} placeholder="e.g., Heavy rain season, freezing temps" />
+                <input data-ai-field="weather_conditions" className="form-input" value={form.weather_conditions} onChange={e => setForm({ ...form, weather_conditions: e.target.value })} placeholder="e.g., Heavy rain season, freezing temps" />
               </div>
             </div>
             <div className="form-group">
               <label>Equipment List</label>
-              <textarea className="form-textarea" value={form.equipment_list} onChange={e => setForm({ ...form, equipment_list: e.target.value })}
+              <textarea data-ai-field="equipment_list" className="form-textarea" value={form.equipment_list} onChange={e => setForm({ ...form, equipment_list: e.target.value })}
                 placeholder="e.g., Water heater (3yr), Electrical panel (10yr), Sewer line (8yr), Concrete pad..." />
             </div>
-            <button type="submit" className="ai-generate-btn" disabled={loading}>
+            <AIRequiredButton data-ai-generate type="submit" className="ai-generate-btn" disabled={loading}>
               {loading ? 'Analyzing...' : 'Predict Maintenance Needs'}
-            </button>
-          </form>
+            </AIRequiredButton>
+          </form></CompleteAIExamples>
         </div>
         <AIOutput data={result} loading={loading} error={error} />
         {history.length > 1 && (

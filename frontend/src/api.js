@@ -9,11 +9,19 @@ const getHeaders = () => {
   };
 };
 
+export const recordsFromResponse = (payload) => {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  return [];
+};
+
 export const api = {
   get: async (path) => {
     const res = await fetch(`${API_BASE}${path}`, { headers: getHeaders() });
     if (res.status === 401) { localStorage.removeItem('token'); window.location.href = '/'; throw new Error('Unauthorized'); }
-    return res.json();
+    const json = await res.json();
+    if (!res.ok) throw Object.assign(new Error(json.error || `HTTP ${res.status}`), { status: res.status, data: json });
+    return json;
   },
   post: async (path, data) => {
     const res = await fetch(`${API_BASE}${path}`, { method: 'POST', headers: getHeaders(), body: JSON.stringify(data) });

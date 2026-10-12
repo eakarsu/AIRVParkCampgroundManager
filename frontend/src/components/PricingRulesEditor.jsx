@@ -22,7 +22,7 @@ function PricingRulesEditor() {
   const load = () => {
     setLoading(true);
     api.get('/custom-views/pricing-rules')
-      .then(res => { setRules(res.rules || []); setError(null); })
+      .then(res => { setRules(Array.isArray(res?.rules) ? res.rules : []); setError(null); })
       .catch(e => setError(e.message || 'Failed to load'))
       .finally(() => setLoading(false));
   };

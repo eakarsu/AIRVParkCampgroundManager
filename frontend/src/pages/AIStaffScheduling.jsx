@@ -1,3 +1,4 @@
+import CompleteAIExamples, { AIRequiredButton } from "../components/CompleteAIExamples";
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import AIOutput from '../components/AIOutput';
@@ -40,21 +41,21 @@ function AIStaffScheduling() {
         </div>
 
         <div className="ai-form">
-          <form onSubmit={handleSubmit}>
+          <CompleteAIExamples busy={loading} context="RV park planning review"><form onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
                 <label>Horizon (days)</label>
-                <input className="form-input" type="number" min={1} max={30} value={horizonDays} onChange={e => setHorizonDays(e.target.value)} />
+                <input data-ai-field="horizonDays" className="form-input" type="number" min={1} max={30} value={horizonDays} onChange={e => setHorizonDays(e.target.value)} />
               </div>
               <div className="form-group">
                 <label>Team size</label>
-                <input className="form-input" type="number" min={1} max={50} value={teamSize} onChange={e => setTeamSize(e.target.value)} />
+                <input data-ai-field="teamSize" className="form-input" type="number" min={1} max={50} value={teamSize} onChange={e => setTeamSize(e.target.value)} />
               </div>
             </div>
 
             <div className="form-group">
               <label>Constraints (optional)</label>
-              <textarea
+              <textarea data-ai-field="constraints"
                 className="form-input"
                 rows={3}
                 value={constraints}
@@ -65,10 +66,10 @@ function AIStaffScheduling() {
 
             {error && <div style={{ background: '#fee2e2', color: '#991b1b', padding: 10, borderRadius: 6, margin: '10px 0' }}>{error}</div>}
 
-            <button type="submit" className="btn-primary" disabled={loading}>
+            <AIRequiredButton data-ai-generate type="submit" className="btn-primary" disabled={loading}>
               {loading ? 'Building schedule...' : 'Generate Schedule'}
-            </button>
-          </form>
+            </AIRequiredButton>
+          </form></CompleteAIExamples>
         </div>
 
         {loading && <div style={{ padding: 20, textAlign: 'center', color: '#94a3b8' }}>AI is balancing shifts...</div>}

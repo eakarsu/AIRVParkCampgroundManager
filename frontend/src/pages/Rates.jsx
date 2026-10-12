@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar';
 import DataTable from '../components/DataTable';
 import DetailModal from '../components/DetailModal';
 import FormModal from '../components/FormModal';
-import { api } from '../api';
+import { api, recordsFromResponse } from '../api';
 
 function Rates() {
   const [data, setData] = useState([]);
@@ -15,7 +15,7 @@ function Rates() {
   const [editData, setEditData] = useState(null);
 
   const fetchData = async () => {
-    try { setLoading(true); const res = await api.get('/rates'); setData(Array.isArray(res) ? res : (res.data || [])); }
+    try { setLoading(true); const res = await api.get('/rates'); setData(recordsFromResponse(res)); }
     catch (e) { setError('Failed to load rates'); } finally { setLoading(false); }
   };
 

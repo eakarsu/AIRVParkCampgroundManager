@@ -38,6 +38,7 @@ const STATIC_LINKS = [
   { to: '/ai/guest-segmentation', label: 'AI Guest Segmentation', group: 'AI tools' },
   { to: '/ai/staff-scheduling', label: 'AI Staff Scheduling', group: 'AI tools' },
   { to: '/ai/amenity-demand-prediction', label: 'AI Amenity Demand Prediction', group: 'AI tools' },
+  { to: '/ai/history', label: 'Saved AI Reports', group: 'AI tools' },
   { to: '/cf-dynamic-pricing-by-occupancy-demand-season', label: 'Cf Dynamic Pricing By Occupancy Demand Season', group: 'Workspace' },
   { to: '/cf-guest-lifetime-value-maximization', label: 'Cf Guest Lifetime Value Maximization', group: 'Workspace' },
   { to: '/cf-occupancy-forecasting-recommendations', label: 'Cf Occupancy Forecasting Recommendations', group: 'Workspace' },

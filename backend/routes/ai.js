@@ -75,7 +75,7 @@ async function persistAIResult(feature, inputSummary, rawContent, parsedData) {
   await pool.query(`
     INSERT INTO ai_results (feature, input_summary, result_text, result_json, model_used, created_at)
     VALUES ($1, $2, $3, $4, $5, NOW())
-  `, [feature, inputSummary.substring(0, 200), rawContent, parsedData ? JSON.stringify(parsedData) : null, process.env.OPENROUTER_MODEL]);
+  `, [feature, inputSummary.substring(0, 200), rawContent, parsedData === null ? null : JSON.stringify(parsedData), process.env.OPENROUTER_MODEL]);
 }
 
 // All AI routes require auth + rate limiting
@@ -122,7 +122,7 @@ Requested Rate Override: $${current_rate || 'N/A'}`;
     const parsed = parseAIJson(content);
     await persistAIResult('dynamic-pricing', `site:${site_id} occupancy:${occupancyRate}%`, content, parsed);
 
-    res.json({ success: true, data: parsed || { raw_response: content }, raw_response: content, occupancy_rate: occupancyRate });
+    res.json({ success: true, data: parsed ?? { raw_response: content }, raw_response: content, occupancy_rate: occupancyRate });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -139,7 +139,7 @@ router.post('/review-response', async (req, res) => {
     const parsed = parseAIJson(content);
     await persistAIResult('review-response', `rating:${rating} guest:${guest_name}`, content, parsed);
 
-    res.json({ success: true, data: parsed || { raw_response: content }, raw_response: content });
+    res.json({ success: true, data: parsed ?? { raw_response: content }, raw_response: content });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -156,7 +156,7 @@ router.post('/activity-recommendations', async (req, res) => {
     const parsed = parseAIJson(content);
     await persistAIResult('activity-recommendations', `location:${location} season:${season}`, content, parsed);
 
-    res.json({ success: true, data: parsed || { raw_response: content }, raw_response: content });
+    res.json({ success: true, data: parsed ?? { raw_response: content }, raw_response: content });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -192,7 +192,7 @@ ${sitesRes.rows.map(s => `Site ${s.site_number}: ${s.type}, Max length ${s.max_r
     const parsed = parseAIJson(content);
     await persistAIResult('site-matching', `rig:${rig_type} len:${rig_length}`, content, parsed);
 
-    res.json({ success: true, data: parsed || { raw_response: content }, raw_response: content });
+    res.json({ success: true, data: parsed ?? { raw_response: content }, raw_response: content });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -209,7 +209,7 @@ router.post('/marketing-content', async (req, res) => {
     const parsed = parseAIJson(content);
     await persistAIResult('marketing-content', `campaign:${campaign_type} season:${season}`, content, parsed);
 
-    res.json({ success: true, data: parsed || { raw_response: content }, raw_response: content });
+    res.json({ success: true, data: parsed ?? { raw_response: content }, raw_response: content });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -243,7 +243,7 @@ ${maintHistory.rows.map(m => `- ${m.type || 'General'}: ${m.description || 'N/A'
     const parsed = parseAIJson(content);
     await persistAIResult('maintenance-prediction', `site:${site_id} age:${site_age_years}`, content, parsed);
 
-    res.json({ success: true, data: parsed || { raw_response: content }, raw_response: content });
+    res.json({ success: true, data: parsed ?? { raw_response: content }, raw_response: content });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -261,7 +261,7 @@ router.post('/occupancy-forecast', async (req, res) => {
     const { content } = await callOpenRouter(sys, user);
     const parsed = parseAIJson(content);
     await persistAIResult('occupancy-forecast', `horizon:${horizon}`, content, parsed);
-    res.json({ success: true, data: parsed || { raw_response: content }, raw_response: content });
+    res.json({ success: true, data: parsed ?? { raw_response: content }, raw_response: content });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -286,7 +286,7 @@ router.post('/upsell-recommendations', async (req, res) => {
     const { content } = await callOpenRouter(sys, user);
     const parsed = parseAIJson(content);
     await persistAIResult('upsell-recommendations', `guest:${guest_id || ''} res:${reservation_id || ''}`, content, parsed);
-    res.json({ success: true, data: parsed || { raw_response: content }, raw_response: content });
+    res.json({ success: true, data: parsed ?? { raw_response: content }, raw_response: content });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -304,7 +304,7 @@ router.post('/cancellation-risk', async (req, res) => {
     const { content } = await callOpenRouter(sys, user);
     const parsed = parseAIJson(content);
     await persistAIResult('cancellation-risk', `res:${reservation_id}`, content, parsed);
-    res.json({ success: true, data: parsed || { raw_response: content }, raw_response: content });
+    res.json({ success: true, data: parsed ?? { raw_response: content }, raw_response: content });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -319,7 +319,7 @@ router.post('/guest-segmentation', requireAIKey, async (req, res) => {
     const { content } = await callOpenRouter(sys, user);
     const parsed = parseAIJson(content);
     await persistAIResult('guest-segmentation', `segments:${segments}`, content, parsed);
-    res.json({ success: true, data: parsed || { raw_response: content }, raw_response: content });
+    res.json({ success: true, data: parsed ?? { raw_response: content }, raw_response: content });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -336,7 +336,7 @@ router.post('/staff-scheduling', requireAIKey, async (req, res) => {
     const { content } = await callOpenRouter(sys, user);
     const parsed = parseAIJson(content);
     await persistAIResult('staff-scheduling', `horizon:${horizon} team:${teamSize}`, content, parsed);
-    res.json({ success: true, data: parsed || { raw_response: content }, raw_response: content });
+    res.json({ success: true, data: parsed ?? { raw_response: content }, raw_response: content });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -352,7 +352,7 @@ router.post('/amenity-demand-prediction', requireAIKey, async (req, res) => {
     const { content } = await callOpenRouter(sys, user);
     const parsed = parseAIJson(content);
     await persistAIResult('amenity-demand-prediction', `horizon:${horizon}`, content, parsed);
-    res.json({ success: true, data: parsed || { raw_response: content }, raw_response: content });
+    res.json({ success: true, data: parsed ?? { raw_response: content }, raw_response: content });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -361,6 +361,20 @@ router.get('/history', async (req, res) => {
     const result = await pool.query('SELECT id, feature, model_used, created_at FROM ai_results ORDER BY created_at DESC LIMIT 25');
     const count = await pool.query('SELECT COUNT(*)::int AS total FROM ai_results');
     res.json({ total: count.rows[0].total, data: result.rows });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/history/:id', async (req, res) => {
+  if (!/^\d+$/.test(req.params.id)) return res.status(400).json({ error: 'Invalid result ID' });
+  try {
+    const result = await pool.query(
+      'SELECT id, feature, model_used, created_at, result_json, result_text FROM ai_results WHERE id = $1',
+      [req.params.id]
+    );
+    if (!result.rows.length) return res.status(404).json({ error: 'Saved AI result not found' });
+    res.json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

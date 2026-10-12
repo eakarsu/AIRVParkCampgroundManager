@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import { api } from '../api';
+import { api, recordsFromResponse } from '../api';
 
 const sections = [
   {
@@ -83,7 +83,7 @@ function Dashboard() {
       for (const ep of endpoints) {
         try {
           const data = await api.get(ep.path);
-          const arr = Array.isArray(data) ? data : (data.data || []);
+          const arr = recordsFromResponse(data);
           setCounts(prev => ({ ...prev, [ep.path]: arr.length }));
           if (ep.key === 'sites') setStats(prev => ({ ...prev, sites: arr.length }));
           if (ep.key === 'reservations') setStats(prev => ({ ...prev, reservations: arr.length }));
@@ -92,7 +92,7 @@ function Dashboard() {
       }
       try {
         const revData = await api.get('/revenue');
-        const revArr = Array.isArray(revData) ? revData : (revData.data || []);
+        const revArr = recordsFromResponse(revData);
         const total = revArr.reduce((sum, r) => sum + (Number(r.amount) || 0), 0);
         setStats(prev => ({ ...prev, revenue: total }));
         setCounts(prev => ({ ...prev, '/revenue': revArr.length }));

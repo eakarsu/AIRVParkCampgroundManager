@@ -2,6 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api';
 
+export function configuredDemoCredentials(env) {
+  if (!env.VITE_DEMO_EMAIL || !env.VITE_DEMO_PASSWORD) return null;
+  return { email: env.VITE_DEMO_EMAIL, password: env.VITE_DEMO_PASSWORD };
+}
+
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -10,8 +15,13 @@ function Login() {
   const navigate = useNavigate();
 
   const handleAutoFill = () => {
-    setEmail(import.meta.env.VITE_DEMO_EMAIL || '');
-    setPassword(import.meta.env.VITE_DEMO_PASSWORD || '');
+    const credentials = configuredDemoCredentials(import.meta.env);
+    if (!credentials) {
+      setError('Demo credentials are not configured for this session. Sign in with your account.');
+      return;
+    }
+    setEmail(credentials.email);
+    setPassword(credentials.password);
     setError('');
   };
 
@@ -44,8 +54,8 @@ function Login() {
           <p>Sign in to manage your park</p>
         </div>
         {error && <div className="login-error">{error}</div>}
-        <button className="auto-fill-btn" onClick={handleAutoFill} type="button">
-          Auto Fill Demo Credentials
+        <button className="auto-fill-btn" onClick={handleAutoFill} type="button" disabled={loading}>
+          Fill Demo Credentials
         </button>
         <form onSubmit={handleSubmit}>
           <div className="form-group">

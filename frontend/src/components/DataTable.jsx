@@ -3,14 +3,15 @@ import React, { useState } from 'react';
 function DataTable({ columns, data, onRowClick, title, onAdd, addLabel, searchFields }) {
   const [search, setSearch] = useState('');
 
+  const rows = Array.isArray(data) ? data : [];
   const filteredData = search && searchFields
-    ? data.filter(row =>
+    ? rows.filter(row =>
         searchFields.some(field => {
           const val = row[field];
           return val && String(val).toLowerCase().includes(search.toLowerCase());
         })
       )
-    : data;
+    : rows;
 
   const renderCell = (row, col) => {
     if (col.render) return col.render(row[col.key], row);

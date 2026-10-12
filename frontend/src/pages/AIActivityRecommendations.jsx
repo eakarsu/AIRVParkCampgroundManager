@@ -1,3 +1,4 @@
+import CompleteAIExamples, { AIRequiredButton } from "../components/CompleteAIExamples";
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import AIOutput from '../components/AIOutput';
@@ -30,15 +31,15 @@ function AIActivityRecommendations() {
           <p>Get personalized activity and attraction recommendations for your guests.</p>
         </div>
         <div className="ai-form">
-          <form onSubmit={handleSubmit}>
+          <CompleteAIExamples busy={loading} context="RV park planning review"><form onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
                 <label>Location</label>
-                <input className="form-input" value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} placeholder="e.g., Smoky Mountains, TN" />
+                <input data-ai-field="location" className="form-input" value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} placeholder="e.g., Smoky Mountains, TN" />
               </div>
               <div className="form-group">
                 <label>Season</label>
-                <select className="form-select" value={form.season} onChange={e => setForm({ ...form, season: e.target.value })}>
+                <select data-ai-field="season" className="form-select" value={form.season} onChange={e => setForm({ ...form, season: e.target.value })}>
                   <option value="spring">Spring</option>
                   <option value="summer">Summer</option>
                   <option value="fall">Fall</option>
@@ -48,19 +49,19 @@ function AIActivityRecommendations() {
             </div>
             <div className="form-group">
               <label>Guest Preferences</label>
-              <textarea className="form-textarea" value={form.guest_preferences} onChange={e => setForm({ ...form, guest_preferences: e.target.value })}
+              <textarea data-ai-field="guest_preferences" className="form-textarea" value={form.guest_preferences} onChange={e => setForm({ ...form, guest_preferences: e.target.value })}
                 placeholder="e.g., Hiking, fishing, nature photography, quiet evenings..." />
             </div>
             <div className="form-group">
               <div className="form-checkbox-group">
-                <input type="checkbox" checked={form.family_friendly} onChange={e => setForm({ ...form, family_friendly: e.target.checked })} />
+                <input data-ai-field="family_friendly" type="checkbox" checked={form.family_friendly} onChange={e => setForm({ ...form, family_friendly: e.target.checked })} />
                 <label>Family Friendly Only</label>
               </div>
             </div>
-            <button type="submit" className="ai-generate-btn" disabled={loading}>
+            <AIRequiredButton data-ai-generate type="submit" className="ai-generate-btn" disabled={loading}>
               {loading ? 'Generating...' : 'Get Recommendations'}
-            </button>
-          </form>
+            </AIRequiredButton>
+          </form></CompleteAIExamples>
         </div>
         <AIOutput data={result} loading={loading} error={error} />
         {history.length > 1 && (

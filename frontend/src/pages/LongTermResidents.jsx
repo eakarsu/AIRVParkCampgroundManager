@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar';
 import DataTable from '../components/DataTable';
 import DetailModal from '../components/DetailModal';
 import FormModal from '../components/FormModal';
-import { api } from '../api';
+import { api, recordsFromResponse } from '../api';
 
 function LongTermResidents() {
   const [data, setData] = useState([]);
@@ -20,9 +20,9 @@ function LongTermResidents() {
     try {
       setLoading(true);
       const [d, g, s] = await Promise.all([api.get('/long-term'), api.get('/guests'), api.get('/sites')]);
-      setData(Array.isArray(d) ? d : (d.data || []));
-      setGuests(Array.isArray(g) ? g : (g.data || []));
-      setSites(Array.isArray(s) ? s : (s.data || []));
+      setData(recordsFromResponse(d));
+      setGuests(recordsFromResponse(g));
+      setSites(recordsFromResponse(s));
     } catch (e) { setError('Failed to load data'); } finally { setLoading(false); }
   };
 

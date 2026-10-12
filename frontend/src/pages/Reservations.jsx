@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar';
 import DataTable from '../components/DataTable';
 import DetailModal from '../components/DetailModal';
 import FormModal from '../components/FormModal';
-import { api } from '../api';
+import { api, recordsFromResponse } from '../api';
 import AvailabilityCalendar from '../components/AvailabilityCalendar';
 
 function Reservations() {
@@ -27,9 +27,9 @@ function Reservations() {
         api.get('/sites'),
         api.get('/guests'),
       ]);
-      setData(Array.isArray(resData) ? resData : (resData.data || []));
-      setSites(Array.isArray(sitesData) ? sitesData : (sitesData.data || []));
-      setGuests(Array.isArray(guestsData) ? guestsData : (guestsData.data || []));
+      setData(recordsFromResponse(resData));
+      setSites(recordsFromResponse(sitesData));
+      setGuests(recordsFromResponse(guestsData));
     } catch (e) { setError('Failed to load data'); }
     finally { setLoading(false); }
   };

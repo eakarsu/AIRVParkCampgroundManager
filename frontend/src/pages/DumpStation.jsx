@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar';
 import DataTable from '../components/DataTable';
 import DetailModal from '../components/DetailModal';
 import FormModal from '../components/FormModal';
-import { api } from '../api';
+import { api, recordsFromResponse } from '../api';
 
 function DumpStation() {
   const [data, setData] = useState([]);
@@ -20,9 +20,9 @@ function DumpStation() {
     try {
       setLoading(true);
       const [d, s, g] = await Promise.all([api.get('/dump-station'), api.get('/sites'), api.get('/guests')]);
-      setData(Array.isArray(d) ? d : (d.data || []));
-      setSites(Array.isArray(s) ? s : (s.data || []));
-      setGuests(Array.isArray(g) ? g : (g.data || []));
+      setData(recordsFromResponse(d));
+      setSites(recordsFromResponse(s));
+      setGuests(recordsFromResponse(g));
     } catch (e) { setError('Failed to load data'); } finally { setLoading(false); }
   };
 

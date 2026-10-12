@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar';
 import DataTable from '../components/DataTable';
 import DetailModal from '../components/DetailModal';
 import FormModal from '../components/FormModal';
-import { api } from '../api';
+import { api, recordsFromResponse } from '../api';
 
 function Propane() {
   const [data, setData] = useState([]);
@@ -19,8 +19,8 @@ function Propane() {
     try {
       setLoading(true);
       const [d, g] = await Promise.all([api.get('/propane'), api.get('/guests')]);
-      setData(Array.isArray(d) ? d : (d.data || []));
-      setGuests(Array.isArray(g) ? g : (g.data || []));
+      setData(recordsFromResponse(d));
+      setGuests(recordsFromResponse(g));
     } catch (e) { setError('Failed to load data'); } finally { setLoading(false); }
   };
 
