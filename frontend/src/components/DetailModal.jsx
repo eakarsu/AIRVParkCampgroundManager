@@ -23,7 +23,7 @@ function DetailModal({ isOpen, onClose, title, data, fields, onEdit, onDelete })
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
+      <div className="modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>{title}</h2>
           <button className="modal-close" onClick={onClose}>&times;</button>
@@ -39,13 +39,9 @@ function DetailModal({ isOpen, onClose, title, data, fields, onEdit, onDelete })
           </div>
         </div>
         <div className="modal-footer">
-          {onDelete && (
-            <button className="btn btn-danger" onClick={() => onDelete(data)}>Delete</button>
-          )}
-          {onEdit && (
-            <button className="btn btn-primary" onClick={() => onEdit(data)}>Edit</button>
-          )}
-          <button className="btn btn-secondary" onClick={onClose}>Close</button>
+          <button className="btn btn-primary" onClick={() => onEdit ? onEdit(data) : onClose()}>Edit</button>
+          <button className="btn btn-danger" onClick={() => onDelete ? onDelete(data) : onClose()}>Delete</button>
+          <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
         </div>
       </div>
     </div>

@@ -3,6 +3,15 @@ const router = express.Router();
 const pool = require('../db');
 const auth = require('../middleware/auth');
 
+router.get('/export', auth, async (req, res) => {
+  try {
+    const result = await pool.query(`SELECT r.*, s.site_number, g.first_name, g.last_name FROM reservations r LEFT JOIN sites s ON r.site_id = s.id LEFT JOIN guests g ON r.guest_id = g.id ORDER BY r.created_at DESC`);
+    const { filterRecords, toCSV } = require('../featurePack');
+    const rows = filterRecords(result.rows.map(r=>({...r, guest_name:`${r.first_name||''} ${r.last_name||''}`.trim()})), req.query);
+    if (String(req.query.format||'json').toLowerCase()==='csv') { res.setHeader('Content-Type','text/csv'); res.setHeader('Content-Disposition','attachment; filename="reservations.csv"'); return res.send(toCSV(rows)); }
+    res.setHeader('Content-Disposition','attachment; filename="reservations.json"'); return res.json({ exportedAt:new Date().toISOString(), count:rows.length, records:rows });
+  } catch (err) { return res.status(500).json({ error: err.message }); }
+});
 router.get('/', async (req, res) => {
   try {
     const result = await pool.query(
@@ -12,7 +21,9 @@ router.get('/', async (req, res) => {
        LEFT JOIN guests g ON r.guest_id = g.id
        ORDER BY r.created_at DESC`
     );
-    res.json(result.rows);
+    const { filterRecords } = require('../featurePack');
+    const rows = result.rows.map(r=>({...r, guest_name:`${r.first_name||''} ${r.last_name||''}`.trim()}));
+    res.json(filterRecords(rows, req.query));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import DetailModal from './DetailModal';
 
 function DataTable({ columns, data, onRowClick, title, onAdd, addLabel, searchFields }) {
   const [search, setSearch] = useState('');
+  const [selectedRow, setSelectedRow] = useState(null);
 
   const rows = Array.isArray(data) ? data : [];
   const filteredData = search && searchFields
@@ -61,7 +63,7 @@ function DataTable({ columns, data, onRowClick, title, onAdd, addLabel, searchFi
             </thead>
             <tbody>
               {filteredData.map((row, idx) => (
-                <tr key={row.id || row._id || idx} onClick={() => onRowClick && onRowClick(row)}>
+                <tr key={row.id || row._id || idx} onClick={() => onRowClick ? onRowClick(row) : setSelectedRow(row)}>
                   {columns.map((col) => (
                     <td key={col.key}>{renderCell(row, col)}</td>
                   ))}
@@ -71,6 +73,7 @@ function DataTable({ columns, data, onRowClick, title, onAdd, addLabel, searchFi
           </table>
         )}
       </div>
+      <DetailModal isOpen={!!selectedRow} onClose={() => setSelectedRow(null)} title={title || "Details"} data={selectedRow} fields={columns || []} />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useLocation } from 'react-router-dom';
 import AppSidebar from './components/AppSidebar';
+import FeaturePackPanel from './components/FeaturePackPanel.jsx';
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
@@ -87,6 +88,7 @@ function App() {
   return (
     <SidebarFrame><Routes>
         <Route path="/insights/timeline" element={<ProtectedRoute><TimelineView /></ProtectedRoute>} />
+      <Route path="/feature-pack" element={<ProtectedRoute><FeaturePackPanel /></ProtectedRoute>} />
         <Route path="/codex/custom-viz" element={<ProtectedRoute><CodexCustomVizFeature /></ProtectedRoute>} />
         <Route path="/codex/operations" element={<ProtectedRoute><CodexOperationsFeature /></ProtectedRoute>} />
 

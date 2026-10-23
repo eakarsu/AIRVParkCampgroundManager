@@ -55,6 +55,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/governed-campground-fulfillment', require('./governance'));
 if (process.env.ENABLE_GENERATED_ROUTES === 'true' && process.env.NODE_ENV !== 'production') app.use('/api/ai/occupancy-forecast', require('./routes/ai-occupancy-forecast'));
 
+app.use('/api/feature-pack', require('./routes/featurePack'));
 app.use('/api/custom-views', require('./routes/customViews'));
 app.use('/api', (req, res) => res.status(404).json({ error: 'Not found', path: req.originalUrl }));
 
